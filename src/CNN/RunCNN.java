@@ -1,11 +1,11 @@
 package CNN;
 
-import edu.hitsz.c102c.cnn.CNN.LayerBuilder;
-import edu.hitsz.c102c.cnn.Layer.Size;
-import edu.hitsz.c102c.dataset.Dataset;
-import edu.hitsz.c102c.util.ConcurenceRunner;
-import edu.hitsz.c102c.util.TimedTest;
-import edu.hitsz.c102c.util.TimedTest.TestTask;
+import CNN.CNN.LayerBuilder;
+import CNN.Layer.Size;
+import dataset.Dataset;
+import util.ConcurenceRunner;
+import util.TimedTest;
+import util.TimedTest.TestTask;
 
 public class RunCNN {
 

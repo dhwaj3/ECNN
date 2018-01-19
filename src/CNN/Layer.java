@@ -2,8 +2,8 @@ package CNN;
 
 import java.io.Serializable;
 
-import edu.hitsz.c102c.util.Log;
-import edu.hitsz.c102c.util.Util;
+import util.Log;
+import util.Util;
 
 /**
  * cnn����Ĳ�

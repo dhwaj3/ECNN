@@ -14,13 +14,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import edu.hitsz.c102c.cnn.Layer.Size;
-import edu.hitsz.c102c.dataset.Dataset;
-import edu.hitsz.c102c.dataset.Dataset.Record;
-import edu.hitsz.c102c.util.ConcurenceRunner.TaskManager;
-import edu.hitsz.c102c.util.Log;
-import edu.hitsz.c102c.util.Util;
-import edu.hitsz.c102c.util.Util.Operator;
+import CNN.Layer.Size;
+import dataset.Dataset;
+import dataset.Dataset.Record;
+import util.ConcurenceRunner.TaskManager;
+import util.Log;
+import util.Util;
+import util.Util.Operator;
 
 public class CNN implements Serializable {
 	/**
