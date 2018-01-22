@@ -325,7 +325,7 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * Update the layer layer convolution kernel (weight) and offse
+	 * Update the layer layer convolution kernel (weight) and offset
 	 * 
 	 * @param layer
 	 *           The current level
@@ -655,22 +655,21 @@ public class CNN implements Serializable {
 			case samp:
 				// The number of map layers is the same as the previous map
 				layer.setOutMapNum(frontMapNum);
-				// ������map�Ĵ�С����һ��map�Ĵ�С����scale��С
-				layer.setMapSize(frontLayer.getMapSize().divide(
-						layer.getScaleSize()));
-				// batch��ÿ����¼��Ҫ����һ�ݲв�
+				// The size of the sample map is the size of the previous map divided by the scale
+				layer.setMapSize(frontLayer.getMapSize().divide(layer.getScaleSize()));
+				// Each record in the batch should have a residual
 				layer.initErros(batchSize);
-				// ÿһ�㶼��Ҫ��ʼ�����map
+				// Each layer needs to initialize the output map
 				layer.initOutmaps(batchSize);
 				break;
 			case output:
-				// ��ʼ��Ȩ�أ�����ˣ��������ľ���˴�СΪ��һ���map��С
+				// Initialization weight (convolution kernel), output layer convolution kernel size of the previous map size
 				layer.initOutputKerkel(frontMapNum, frontLayer.getMapSize());
-				// ��ʼ��ƫ�ã�����frontMapNum*outMapNum��ƫ��
+				// Initialize offset, total frontMapNum * outMapNum offset
 				layer.initBias(frontMapNum);
-				// batch��ÿ����¼��Ҫ����һ�ݲв�
+				// Each record in the batch should have a residual
 				layer.initErros(batchSize);
-				// ÿһ�㶼��Ҫ��ʼ�����map
+				// Each layer needs to initialize the output map
 				layer.initOutmaps(batchSize);
 				break;
 			}
@@ -678,11 +677,12 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * ������ģʽ�������,Ҫ�����ڶ������Ϊ�����������Ϊ�����
+	 * Constructor mode Constructs layers, requiring that the second last must be a sampling layer and not a convolution
+
 	 * 
 	 * @author jiqunpeng
 	 * 
-	 *         ����ʱ�䣺2014-7-8 ����4:54:29
+	 *        Created: 2014-7-8 下午 4:54:29
 	 */
 	public static class LayerBuilder {
 		private List<Layer> mLayers;
@@ -703,7 +703,7 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * ���л�����ģ��
+	 * Serialize the save model
 	 * 
 	 * @param fileName
 	 */
@@ -721,8 +721,8 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * �����л�����ģ��
 	 * 
+	 *  Deserialize the import model
 	 * @param fileName
 	 * @return
 	 */
