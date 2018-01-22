@@ -30,30 +30,33 @@ public class CNN implements Serializable {
 	private static double ALPHA = 0.85;
 	protected static final double LAMBDA = 0;
 	
+        //Various layers of the network
 	private List<Layer> layers;
-	// ����
+	
+        // Layers
 	private int layerNum;
 
-	// �������µĴ�С
+	// Batch update size
 	private int batchSize;
-	// �������������Ծ����ÿһ��Ԫ�س���һ��ֵ
+	// The divisor operator divides each element of the matrix by a value
 	private Operator divide_batchSize;
 
-	// �������������Ծ����ÿһ��Ԫ�س���alphaֵ
+	// The multiplier operator multiplies each element of the matrix by the alpha valueֵ
 	private Operator multiply_alpha;
 
-	// �������������Ծ����ÿһ��Ԫ�س���1-labmda*alphaֵ
+	// Multiplier operator, multiplying each element of the matrix by the 1-labmda * alpha value
 	private Operator multiply_lambda;
 
 	/**
-	 * ��ʼ������
+	 * Initialize the network
 	 * 
 	 * @param layerBuilder
-	 *            �����
+	 *  Network layer
+         * 
 	 * @param inputMapSize
-	 *            ����map�Ĵ�С
+	 *  Enter the size of the map
 	 * @param classNum
-	 *            ���ĸ�����Ҫ�����ݼ������ת��Ϊ0-classNum-1����ֵ
+	 *            The number of categories requires the dataset to convert the class label to a value of 0-classNum-1
 	 */
 	public CNN(LayerBuilder layerBuilder, final int batchSize) {
 		layers = layerBuilder.mLayers;
@@ -64,7 +67,7 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * ��ʼ��������
+	 * Initialization operator
 	 */
 	private void initPerator() {
 		divide_batchSize = new Operator() {
@@ -102,19 +105,19 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * ��ѵ������ѵ������
+	 * Train the network on the training set
 	 * 
 	 * @param trainset
 	 * @param repeat
-	 *            �����Ĵ���
+	 *         The number of iterations
 	 */
 	public void train(Dataset trainset, int repeat) {
-		// ����ֹͣ��ť
+		// Monitor stop button
 		new Lisenter().start();
 		for (int t = 0; t < repeat && !stopTrain.get(); t++) {
 			int epochsNum = trainset.size() / batchSize;
 			if (trainset.size() % batchSize != 0)
-				epochsNum++;// ���ȡһ�Σ�������ȡ��
+				epochsNum++;// Extract once, round up
 			Log.i("");
 			Log.i(t + "th iter epochsNum:" + epochsNum);
 			int right = 0;
@@ -131,7 +134,7 @@ public class CNN implements Serializable {
 					Layer.prepareForNewRecord();
 				}
 
-				// ����һ��batch�����Ȩ��
+				// After finishing a batch update weight
 				updateParas();
 				if (i % 50 == 0) {
 					System.out.print("..");
@@ -140,7 +143,7 @@ public class CNN implements Serializable {
 				}
 			}
 			double p = 1.0 * right / count;
-			if (t % 10 == 1 && p > 0.96) {//��̬����׼ѧϰ����
+			if (t % 10 == 1 && p > 0.96) {//Adjust the quasi-learning rate dynamically
 				ALPHA = 0.001 + ALPHA * 0.9;
 				Log.i("Set alpha = " + ALPHA);
 			}
@@ -176,8 +179,8 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * ��������
-	 * 
+	 * Test Data
+         * 
 	 * @param trainset
 	 * @return
 	 */
@@ -204,7 +207,7 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * Ԥ����
+	 * forecast result
 	 * 
 	 * @param testset
 	 * @param fileName
@@ -255,7 +258,7 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * ѵ��һ����¼��ͬʱ�����Ƿ�Ԥ����ȷ��ǰ��¼
+	 *  Training a record, at the same time return to predict the correct current record
 	 * 
 	 * @param record
 	 * @return
@@ -268,7 +271,7 @@ public class CNN implements Serializable {
 	}
 
 	/*
-	 * ������
+	 * Reverse transmission
 	 */
 	private boolean backPropagation(Record record) {
 		boolean result = setOutLayerErrors(record);
@@ -277,7 +280,7 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * ���²���
+	 * Update parameters
 	 */
 	private void updateParas() {
 		for (int l = 1; l < layerNum; l++) {
@@ -296,7 +299,7 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * ����ƫ��
+	 *  Update offset
 	 * 
 	 * @param layer
 	 * @param lastLayer
@@ -311,7 +314,7 @@ public class CNN implements Serializable {
 			public void process(int start, int end) {
 				for (int j = start; j < end; j++) {
 					double[][] error = Util.sum(errors, j);
-					// ����ƫ��
+					// Update offset
 					double deltaBias = Util.sum(error) / batchSize;
 					double bias = layer.getBias(j) + ALPHA * deltaBias;
 					layer.setBias(j, bias);
@@ -322,12 +325,12 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * ����layer��ľ���ˣ�Ȩ�أ���ƫ��
+	 * Update the layer layer convolution kernel (weight) and offse
 	 * 
 	 * @param layer
-	 *            ��ǰ��
+	 *           The current level
 	 * @param lastLayer
-	 *            ǰһ��
+	 *            The previous floor
 	 */
 	private void updateKernels(final Layer layer, final Layer lastLayer) {
 		int mapNum = layer.getOutMapNum();
@@ -338,24 +341,24 @@ public class CNN implements Serializable {
 			public void process(int start, int end) {
 				for (int j = start; j < end; j++) {
 					for (int i = 0; i < lastMapNum; i++) {
-						// ��batch��ÿ����¼delta���
+						// Sums each record delta for the batch
 						double[][] deltaKernel = null;
 						for (int r = 0; r < batchSize; r++) {
 							double[][] error = layer.getError(r, j);
 							if (deltaKernel == null)
 								deltaKernel = Util.convnValid(
 										lastLayer.getMap(r, i), error);
-							else {// �ۻ����
+							else {// Summing up
 								deltaKernel = Util.matrixOp(Util.convnValid(
 										lastLayer.getMap(r, i), error),
 										deltaKernel, null, null, Util.plus);
 							}
 						}
 
-						// ����batchSize
+						// Divide by batchSize
 						deltaKernel = Util.matrixOp(deltaKernel,
 								divide_batchSize);
-						// ���¾����
+						// Update the convolution kernel
 						double[][] kernel = layer.getKernel(i, j);
 						deltaKernel = Util.matrixOp(kernel, deltaKernel,
 								multiply_lambda, multiply_alpha, Util.plus);
@@ -369,7 +372,7 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * �����н�����Ĳв�
+	 * Set the median will be the residual layers
 	 */
 	private void setHiddenLayerErrors() {
 		for (int l = layerNum - 2; l > 0; l--) {
@@ -382,14 +385,15 @@ public class CNN implements Serializable {
 			case conv:
 				setConvErrors(layer, nextLayer);
 				break;
-			default:// ֻ�в�����;������Ҫ����в�����û�вв������Ѿ������
+			default:// ֻOnly the sampling layer and the convolution layer need to deal with the residuals, 
+                                //  the input layer has no residuals and the output layer has been processed
 				break;
 			}
 		}
 	}
 
 	/**
-	 * ���ò�����Ĳв�
+	 * Set the sampling layer residuals
 	 * 
 	 * @param layer
 	 * @param nextLayer
@@ -402,11 +406,11 @@ public class CNN implements Serializable {
 			@Override
 			public void process(int start, int end) {
 				for (int i = start; i < end; i++) {
-					double[][] sum = null;// ��ÿһ������������
+					double[][] sum = null;// Summarize each convolution
 					for (int j = 0; j < nextMapNum; j++) {
 						double[][] nextError = nextLayer.getError(j);
 						double[][] kernel = nextLayer.getKernel(i, j);
-						// �Ծ���˽���180����ת��Ȼ�����fullģʽ�µþ��
+						// Rotate the convolution kernel by 180 degrees and then convolve in full mode
 						if (sum == null)
 							sum = Util
 									.convnFull(nextError, Util.rot180(kernel));
@@ -425,14 +429,14 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * ���þ����Ĳв�
+	 * Set the convolutional layer residuals
 	 * 
 	 * @param layer
 	 * @param nextLayer
 	 */
 	private void setConvErrors(final Layer layer, final Layer nextLayer) {
-		// ��������һ��Ϊ�����㣬�������map������ͬ����һ��mapֻ����һ���һ��map���ӣ�
-		// ���ֻ�轫��һ��Ĳв�kronecker��չ���õ������
+		// The next layer of the convolutional layer is the sampling layer, that is, the two layers have the same number of maps, and one map connects only with one map of the first layer,
+               // So just spread the next layer of residual kronecker to dot product
 		int mapNum = layer.getOutMapNum();
 		new TaskManager(mapNum) {
 
@@ -442,7 +446,7 @@ public class CNN implements Serializable {
 					Size scale = nextLayer.getScaleSize();
 					double[][] nextError = nextLayer.getError(m);
 					double[][] map = layer.getMap(m);
-					// ������ˣ����Եڶ��������ÿ��Ԫ��value����1-value����
+					//Matrix multiplication, but 1-value operation on each element value of the second matrix
 					double[][] outMatrix = Util.matrixOp(map,
 							Util.cloneMatrix(map), null, Util.one_value,
 							Util.multiply);
@@ -459,7 +463,7 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * ���������Ĳв�ֵ,�������񾭵�Ԫ�������٣��ݲ����Ƕ��߳�
+	 * Set the output layer of the residual value, the number of output neurons fewer units, not to consider multi-threading
 	 * 
 	 * @param record
 	 * @return
@@ -479,7 +483,7 @@ public class CNN implements Serializable {
 		// (target[m] - output);
 		// outputLayer.setError(m, 0, 0, errors);
 		// }
-		// // ��ȷ
+		// // correct
 		// if (isSame(outmaps, target))
 		// return true;
 		// return false;
@@ -504,24 +508,24 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * ǰ�����һ����¼
+	 * Forward calculation of a record
 	 * 
 	 * @param record
 	 */
 	private void forward(Record record) {
-		// ����������map
+		// Set the map of the input layer
 		setInLayerOutput(record);
 		for (int l = 1; l < layers.size(); l++) {
 			Layer layer = layers.get(l);
 			Layer lastLayer = layers.get(l - 1);
 			switch (layer.getType()) {
-			case conv:// ������������
+			case conv:// Compute the output of the convolution layer
 				setConvOutput(layer, lastLayer);
 				break;
-			case samp:// �������������
+			case samp:// Calculate the output of the sampling layer
 				setSampOutput(layer, lastLayer);
 				break;
-			case output:// �������������,�������һ������ľ����
+			case output:// Calculate the output of the output layer, the output layer is a special convolution layer
 				setConvOutput(layer, lastLayer);
 				break;
 			default:
@@ -531,7 +535,7 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * ���ݼ�¼ֵ���������������ֵ
+	 * Set the input layers output value based on the recorded value
 	 * 
 	 * @param record
 	 */
@@ -540,17 +544,17 @@ public class CNN implements Serializable {
 		final Size mapSize = inputLayer.getMapSize();
 		final double[] attr = record.getAttrs();
 		if (attr.length != mapSize.x * mapSize.y)
-			throw new RuntimeException("���ݼ�¼�Ĵ�С�붨���map��С��һ��!");
+			throw new RuntimeException("The size of the data record does not match the size of the map defined!");
 		for (int i = 0; i < mapSize.x; i++) {
 			for (int j = 0; j < mapSize.y; j++) {
-				// ����¼���Ե�һά����Ū�ɶ�ά����
+				// A one-dimensional vector of recording properties is made into a two-dimensional matrix
 				inputLayer.setMapValue(0, i, j, attr[mapSize.x * i + j]);
 			}
 		}
 	}
 
 	/*
-	 * �����������ֵ,ÿ���̸߳���һ����map
+	 * Compute the output of the convolutional layer, each thread is responsible for part of the map
 	 */
 	private void setConvOutput(final Layer layer, final Layer lastLayer) {
 		int mapNum = layer.getOutMapNum();
@@ -560,7 +564,7 @@ public class CNN implements Serializable {
 			@Override
 			public void process(int start, int end) {
 				for (int j = start; j < end; j++) {
-					double[][] sum = null;// ��ÿһ������map�ľ���������
+					double[][] sum = null;// Sum the convolution of each input map
 					for (int i = 0; i < lastMapNum; i++) {
 						double[][] lastMap = lastLayer.getMap(i);
 						double[][] kernel = layer.getKernel(i, j);
@@ -591,7 +595,7 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * ���ò���������ֵ���������ǶԾ����ľ�ֵ����
+	 * Set the output value of the sampling layer. The sampling layer is the mean processing of the convolution layer
 	 * 
 	 * @param layer
 	 * @param lastLayer
@@ -605,7 +609,7 @@ public class CNN implements Serializable {
 				for (int i = start; i < end; i++) {
 					double[][] lastMap = lastLayer.getMap(i);
 					Size scaleSize = layer.getScaleSize();
-					// ��scaleSize������о�ֵ����
+					// The scaleSize area for averaging
 					double[][] sampMatrix = Util
 							.scaleMatrix(lastMap, scaleSize);
 					layer.setMapValue(i, sampMatrix);
@@ -617,7 +621,7 @@ public class CNN implements Serializable {
 	}
 
 	/**
-	 * ����cnn�����ÿһ��Ĳ���
+	 * Set cnn network parameters of each layer
 	 * 
 	 * @param batchSize
 	 *            * @param classNum
@@ -625,7 +629,7 @@ public class CNN implements Serializable {
 	 */
 	public void setup(int batchSize) {
 		Layer inputLayer = layers.get(0);
-		// ÿһ�㶼��Ҫ��ʼ�����map
+		// Each layer needs to initialize the output map
 		inputLayer.initOutmaps(batchSize);
 		for (int i = 1; i < layers.size(); i++) {
 			Layer layer = layers.get(i);
@@ -635,21 +639,21 @@ public class CNN implements Serializable {
 			case input:
 				break;
 			case conv:
-				// ����map�Ĵ�С
+				// Set the size of the map
 				layer.setMapSize(frontLayer.getMapSize().subtract(
 						layer.getKernelSize(), 1));
-				// ��ʼ������ˣ�����frontMapNum*outMapNum�������
+				//Initializes the convolution kernel with a total of frontMapNum * outMapNum convolution kernels
 
 				layer.initKernel(frontMapNum);
-				// ��ʼ��ƫ�ã�����frontMapNum*outMapNum��ƫ��
+				// Initialize offset, total frontMapNum * outMapNum offset
 				layer.initBias(frontMapNum);
-				// batch��ÿ����¼��Ҫ����һ�ݲв�
+				// Each record in the batch should have a residual
 				layer.initErros(batchSize);
-				// ÿһ�㶼��Ҫ��ʼ�����map
+				// Each layer needs to initialize the output map
 				layer.initOutmaps(batchSize);
 				break;
 			case samp:
-				// �������map��������һ����ͬ
+				// The number of map layers is the same as the previous map
 				layer.setOutMapNum(frontMapNum);
 				// ������map�Ĵ�С����һ��map�Ĵ�С����scale��С
 				layer.setMapSize(frontLayer.getMapSize().divide(
