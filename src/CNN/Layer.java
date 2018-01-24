@@ -6,53 +6,54 @@ import util.Log;
 import util.Util;
 
 /**
- * cnn����Ĳ�
+ * CNN network layer
  * 
- * @author jiqunpeng
+ * @author Dhwaj verma
  * 
- *         ����ʱ�䣺2014-7-8 ����3:58:46
+ *        
  */
 public class Layer implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -5747622503947497069L;
-	private LayerType type;// �������
-	private int outMapNum;// ���map�ĸ���
-	private Size mapSize;// map�Ĵ�С
-	private Size kernelSize;// ����˴�С��ֻ�о������
-	private Size scaleSize;// ������С��ֻ�в�������
-	private double[][][][] kernel;// ����ˣ�ֻ�о������������
-	private double[] bias;// ÿ��map��Ӧһ��ƫ�ã�ֻ�о������������
-	// �������batch�����map��outmaps[0][0]��ʾ��һ����¼ѵ���µ�0�����map
+	private LayerType type;// The type of layer
+	private int outMapNum;//The number of map output
+	private Size mapSize;// The size of the map
+	private Size kernelSize;// Convolution kernel size, only the convolution layer
+	private Size scaleSize;// Sampling size, only the sampling layer
+	private double[][][][] kernel;// Convolution kernel, only convolution layer and output layer
+	private double[] bias;// Each map corresponds to a bias, only the convolutional layer and the output layer
+	// Save the output of each batch map, outmaps [0] [0] said the first record training 0th output map
 	private double[][][][] outmaps;
-	// �в��matlab toolbox��d��Ӧ
+	// Residual, and matlab toolbox d corresponding
 	private double[][][][] errors;
 
-	private static int recordInBatch = 0;// ��¼��ǰѵ������batch�ĵڼ�����¼
+	private static int recordInBatch = 0;// Record the current training is batch of the first few records
 
-	private int classNum = -1;// ������
+	private int classNum = -1;// Number of categories
+
 
 	private Layer() {
 
 	}
 
 	/**
-	 * ׼����һ��batch��ѵ��
+	 * Prepare for the next batch of training
 	 */
 	public static void prepareForNewBatch() {
 		recordInBatch = 0;
 	}
 
 	/**
-	 * ׼����һ����¼��ѵ��
+	 * Prepare for the next record of training
 	 */
 	public static void prepareForNewRecord() {
 		recordInBatch++;
 	}
 
 	/**
-	 * ��ʼ�������
+	 * Initialize the input layer
 	 * 
 	 * @param mapSize
 	 * @return
@@ -60,14 +61,13 @@ public class Layer implements Serializable {
 	public static Layer buildInputLayer(Size mapSize) {
 		Layer layer = new Layer();
 		layer.type = LayerType.input;
-		layer.outMapNum = 1;// ������map����Ϊ1����һ��ͼ
+		layer.outMapNum = 1;// The number of map input layer 1, that is, a map
 		layer.setMapSize(mapSize);//
 		return layer;
 	}
 
 	/**
-	 * ��������
-	 * 
+	 * Build a convolution layer
 	 * @return
 	 */
 	public static Layer buildConvLayer(int outMapNum, Size kernelSize) {
@@ -79,7 +79,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ���������
+	 * Structure the sampling layer
 	 * 
 	 * @param scaleSize
 	 * @return
@@ -92,7 +92,8 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ���������,���������������ĸ��������������Ԫ�ĸ���
+	 * Structure output layer, the number of categories,
+         * according to the number of categories to determine the number of output units
 	 * 
 	 * @return
 	 */
@@ -111,7 +112,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��ȡmap�Ĵ�С
+	 * Get the size of the map
 	 * 
 	 * @return
 	 */
@@ -120,8 +121,9 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ����map�Ĵ�С
 	 * 
+	 * Get the size of the map
+
 	 * @param mapSize
 	 */
 	public void setMapSize(Size mapSize) {
@@ -129,7 +131,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��ȡ�������
+	 * Get the type of layer
 	 * 
 	 * @return
 	 */
@@ -138,7 +140,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��ȡ�����������
+	 * Get the number of output vectors
 	 * 
 	 * @return
 	 */
@@ -148,7 +150,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * �������map�ĸ���
+	 * Set the number of output map
 	 * 
 	 * @param outMapNum
 	 */
@@ -157,7 +159,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��ȡ����˵Ĵ�С��ֻ�о������kernelSize���������δnull
+	 * Get the size of the convolution kernel, only convolutional kernelSize, other layers are not null
 	 * 
 	 * @return
 	 */
@@ -166,7 +168,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��ȡ������С��ֻ�в�������scaleSize���������δnull
+	 * Get the sample size, only the sample layer scaleSize, other layers are not null
 	 * 
 	 * @return
 	 */
@@ -175,16 +177,17 @@ public class Layer implements Serializable {
 	}
 
 	enum LayerType {
-		// ���������ͣ�����㡢����㡢����㡢������
+		// Network layer types: input layer, output layer, convolution layer, sampling layer
 		input, output, conv, samp
 	}
 
 	/**
-	 * ����˻��߲�����scale�Ĵ�С,�������Բ���.���Ͱ�ȫ�����Ժ󲻿��޸�
+	 * Convolution kernel or sample layer scale size, length and width may vary. 
+         * Type safety, can not be modified after setting
 	 * 
 	 * @author jiqunpeng
 	 * 
-	 *         ����ʱ�䣺2014-7-8 ����4:11:00
+	 *         
 	 */
 	public static class Size implements Serializable {
 
@@ -204,8 +207,8 @@ public class Layer implements Serializable {
 		}
 
 		/**
-		 * ����scaleSize�õ�һ���µ�Size��Ҫ��this.x��this.
-		 * y�ֱܷ�scaleSize.x��scaleSize.y����
+		 * Divide scaleSize to get a new Size, this.x, this.
+                 * y can be divided by scaleSize.x, scaleSize.y respectively
 		 * 
 		 * @param scaleSize
 		 * @return
@@ -214,12 +217,12 @@ public class Layer implements Serializable {
 			int x = this.x / scaleSize.x;
 			int y = this.y / scaleSize.y;
 			if (x * scaleSize.x != this.x || y * scaleSize.y != this.y)
-				throw new RuntimeException(this + "��������" + scaleSize);
+				throw new RuntimeException(this + "不能整除" + scaleSize);
 			return new Size(x, y);
 		}
 
 		/**
-		 * ��ȥsize��С����x��y�ֱ𸽼�һ��ֵappend
+		 * Subtract size and append a value append to x and y, respectively
 		 * 
 		 * @param size
 		 * @param append
@@ -233,7 +236,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * �����ʼ�������
+	 * Convolution kernels are initialized randomly
 	 * 
 	 * @param frontMapNum
 	 */
@@ -248,7 +251,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * �����ľ���˵Ĵ�С����һ���map��С
+	 * The size of the convolution kernel of the output layer is the map size of the previous layer
 	 * 
 	 * @param frontMapNum
 	 * @param size
@@ -265,7 +268,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��ʼ��ƫ��
+	 * Initialize the offset
 	 * 
 	 * @param frontMapNum
 	 */
@@ -274,7 +277,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��ʼ�����map
+	 * Initialize the output map
 	 * 
 	 * @param batchSize
 	 */
@@ -283,14 +286,14 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ����mapֵ
+	 * Set the map value
 	 * 
 	 * @param mapNo
-	 *            �ڼ���map
+	 *            The first few map
 	 * @param mapX
-	 *            map�ĸ�
+	 *            map high
 	 * @param mapY
-	 *            map�Ŀ�
+	 *           map wide
 	 * @param value
 	 */
 	public void setMapValue(int mapNo, int mapX, int mapY, double value) {
@@ -300,7 +303,7 @@ public class Layer implements Serializable {
 	static int count = 0;
 
 	/**
-	 * �Ծ�����ʽ���õ�mapNo��map��ֵ
+	 * Set the value of mapNo map in matrix form
 	 * 
 	 * @param mapNo
 	 * @param outMatrix
@@ -312,8 +315,10 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��ȡ��index��map���󡣴������ܿ��ǣ�û�з��ظ��ƶ��󣬶���ֱ�ӷ������ã����ö��������
-	 * �����޸�outmaps�������޸������setMapValue(...)
+	 * Get the index map matrix. In performance considerations, 
+         * did not return a copy of the object, 
+         * but directly return the reference, the call side please be careful,
+         * Avoid modifying out maps, please call setMapValue (...)
 	 * 
 	 * @param index
 	 * @return
@@ -323,12 +328,12 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��ȡǰһ���i��map����ǰ���j��map�ľ����
+	 * Get the convolution kernel of the i th map of the previous layer to the j th map of the current layer
 	 * 
 	 * @param i
-	 *            ��һ���map�±�
+	 *            The next level of the map subscript
 	 * @param j
-	 *            ��ǰ���map�±�
+	 *            The current level of the map subscript
 	 * @return
 	 */
 	public double[][] getKernel(int i, int j) {
@@ -336,7 +341,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ���òв�ֵ
+	 * Set the residual value
 	 * 
 	 * @param mapNo
 	 * @param mapX
@@ -348,7 +353,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��map�������ʽ���òв�ֵ
+	 * Set the residual value as a map matrix block
 	 * 
 	 * @param mapNo
 	 * @param matrix
@@ -360,8 +365,8 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��ȡ��mapNo��map�Ĳв�.û�з��ظ��ƶ��󣬶���ֱ�ӷ������ã����ö��������
-	 * �����޸�errors�������޸������setError(...)
+	 * Get the mapNo a map of the residual.Do not return a copy of the object, but directly return the reference, the call side please be careful,
+         * Avoid modifying errors, if you need to modify setError (...)
 	 * 
 	 * @param mapNo
 	 * @return
@@ -371,7 +376,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��ȡ����(ÿ����¼��ÿ��map)�Ĳв�
+	 * Gets all the residuals (per record and per map)
 	 * 
 	 * @return
 	 */
@@ -380,7 +385,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��ʼ���в�����
+	 * Initialize the residual array
 	 * 
 	 * @param batchSize
 	 */
@@ -399,7 +404,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��ȡ��mapNo��
+	 * Get the first mapNo
 	 * 
 	 * @param mapNo
 	 * @return
@@ -409,7 +414,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ���õ�mapNo��map��ƫ��ֵ
+	 * Get the first mapNo
 	 * 
 	 * @param mapNo
 	 * @param value
@@ -419,7 +424,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��ȡbatch����map����
+	 * Get batch of map matrices
 	 * 
 	 * @return
 	 */
@@ -429,7 +434,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��ȡ��recordId��¼�µ�mapNo�Ĳв�
+	 * Get the first recordId record the first mapNo residual
 	 * 
 	 * @param recordId
 	 * @param mapNo
@@ -440,7 +445,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��ȡ��recordId��¼�µ�mapNo�����map
+	 * Get the first recordId record mapNo output map
 	 * 
 	 * @param recordId
 	 * @param mapNo
@@ -451,7 +456,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��ȡ������
+	 * Get the number of categories
 	 * 
 	 * @return
 	 */
@@ -460,7 +465,7 @@ public class Layer implements Serializable {
 	}
 
 	/**
-	 * ��ȡ���еľ����
+	 * Get all the convolution kernels
 	 * 
 	 * @return
 	 */
