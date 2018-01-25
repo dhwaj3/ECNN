@@ -10,7 +10,7 @@ import util.TimedTest.TestTask;
 public class RunCNN {
 
 	public static void runCnn() {
-		//����һ�����������
+		//Create a convolutional neural network
 		LayerBuilder builder = new LayerBuilder();
 		builder.addLayer(Layer.buildInputLayer(new Size(28, 28)));
 		builder.addLayer(Layer.buildConvLayer(6, new Size(5, 5)));
@@ -20,7 +20,7 @@ public class RunCNN {
 		builder.addLayer(Layer.buildOutputLayer(10));
 		CNN cnn = new CNN(builder, 50);
 		
-		//�������ݼ�
+		//Import the data set
 		String fileName = "dataset/train.format";
 		Dataset dataset = Dataset.load(fileName, ",", 784);
 		cnn.train(dataset, 3);//
@@ -29,7 +29,7 @@ public class RunCNN {
 		dataset.clear();
 		dataset = null;
 		
-		//Ԥ��
+		//prediction
 		// CNN cnn = CNN.loadModel(modelName);	
 		Dataset testset = Dataset.load("dataset/test.format", ",", -1);
 		cnn.predict(testset, "dataset/test.predict");
