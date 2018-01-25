@@ -5,11 +5,9 @@ import java.util.Locale;
 import util.TimedTest.TestTask;
 
 /**
- * ����Ԫ��ֱ�ӷ���������ͨ���������������Ч�ʣ� ���ۣ�������ʽ���ʲ�û�н����ٶ�
+ *The test element accesses the array directly and accesses the array through the function, concluding that the formal function access does not slow down
  * 
- * @author jiqunpeng
  * 
- *         ����ʱ�䣺2014-7-9 ����3:18:30
  */
 public class TestArray {
 	double[][] data;
@@ -35,7 +33,7 @@ public class TestArray {
 	}
 
 	public static void main(String[] args) {
-		String a = "aAdfa��_";
+		String a = "aAdfa Peng _";
 		System.out.println(a.toUpperCase(Locale.CHINA));
 		double[][] d = new double[3][];
 //		d[0] = new double[] { 1,2,3 };

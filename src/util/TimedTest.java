@@ -1,11 +1,9 @@
 package util;
 
 /**
- * ��ʱ�Ĳ��Թ���
+ * Timing test tool
  * 
- * @author jiqunpeng
  * 
- *         ����ʱ�䣺2014-7-8 ����8:21:56
  */
 public class TimedTest {
 	private int repeat;

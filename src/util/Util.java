@@ -11,17 +11,15 @@ import util.TimedTest.TestTask;
 public class Util {
 
 	/**
-	 * �����ӦԪ�����ʱ��ÿ��Ԫ���ϵĲ���
+	 * The operation on each element when the matrix corresponds to the element multiplication
 	 * 
-	 * @author jiqunpeng
 	 * 
-	 *         ����ʱ�䣺2014-7-9 ����9:28:35
 	 */
 	public interface Operator extends Serializable {
 		public double process(double value);
 	}
 
-	// ����ÿ��Ԫ��value������1-value�Ĳ���
+	// Define the value of each element 1-value operation
 	public static final Operator one_value = new Operator() {
 		/**
 		 * 
@@ -34,7 +32,7 @@ public class Util {
 		}
 	};
 
-	// digmod����
+	// digmod function
 	public static final Operator digmod = new Operator() {
 		/**
 		 * 
@@ -52,7 +50,7 @@ public class Util {
 	}
 
 	/**
-	 * ��������ӦԪ�صļӷ�����
+	 * Define the addition operation of the corresponding elements of the matrix
 	 */
 	public static final OperatorOnTwo plus = new OperatorOnTwo() {
 		/**
@@ -66,7 +64,7 @@ public class Util {
 		}
 	};
 	/**
-	 * ��������ӦԪ�صĳ˷�����
+	 * Defines the multiplication of the corresponding elements of the matrix
 	 */
 	public static OperatorOnTwo multiply = new OperatorOnTwo() {
 		/**
@@ -81,7 +79,7 @@ public class Util {
 	};
 
 	/**
-	 * ��������ӦԪ�صļ�������
+	 * Defines the matrix subtraction of the corresponding elements
 	 */
 	public static OperatorOnTwo minus = new OperatorOnTwo() {
 		/**
@@ -105,7 +103,7 @@ public class Util {
 	}
 
 	/**
-	 * �Ծ������180����ת,����matrix�ĸ����ϸ��ƣ������ԭ���ľ�������޸�
+	 * Rotate the matrix 180 degrees, is copied in the matrix copy will not be modified on the original matrix
 	 * 
 	 * @param matrix
 	 */
@@ -113,7 +111,7 @@ public class Util {
 		matrix = cloneMatrix(matrix);
 		int m = matrix.length;
 		int n = matrix[0].length;
-		// ���жԳƽ��н���
+		// Exchange by column symmetry
 		for (int i = 0; i < m; i++) {
 			for (int j = 0; j < n / 2; j++) {
 				double tmp = matrix[i][j];
@@ -121,7 +119,7 @@ public class Util {
 				matrix[i][n - 1 - j] = tmp;
 			}
 		}
-		// ���жԳƽ��н���
+		// Exchange by line symmetry
 		for (int j = 0; j < n; j++) {
 			for (int i = 0; i < m / 2; i++) {
 				double tmp = matrix[i][j];
@@ -135,7 +133,7 @@ public class Util {
 	private static Random r = new Random(2);
 
 	/**
-	 * �����ʼ������
+	 * Random initialization matrix
 	 * 
 	 * @param x
 	 * @param y
@@ -147,7 +145,7 @@ public class Util {
 		int tag = 1;
 		for (int i = 0; i < x; i++) {
 			for (int j = 0; j < y; j++) {
-				// ���ֵ��[-0.05,0.05)֮�䣬��Ȩ�س�ʼ��ֵ��С���������ڱ�������
+				// Random values ​​between [-0.05,0.05), the weight initialization value smaller, help to avoid over-fitting
 				matrix[i][j] = (r.nextDouble() - 0.05) / 10;
 //				matrix[i][j] = tag * 0.5;
 //				if (b)
@@ -160,7 +158,7 @@ public class Util {
 	}
 
 	/**
-	 * �����ʼ��һά����
+	 * Randomly initialize one-dimensional vectors
 	 * 
 	 * @param len
 	 * @return
@@ -175,7 +173,7 @@ public class Util {
 	}
 
 	/**
-	 * ������еĳ����������ȡbatchSize��[0,size)����
+	 * Randomly arranged samples, randomly selected batchSize [0, size) of the book
 	 * 
 	 * @param size
 	 * @param batchSize
@@ -194,7 +192,7 @@ public class Util {
 	}
 
 	/**
-	 * ���ƾ���
+	 * Copy matrix
 	 * 
 	 * @param matrix
 	 * @return
@@ -214,7 +212,7 @@ public class Util {
 	}
 
 	/**
-	 * �Ե���������в���
+	 * Operate on a single matrix
 	 * 
 	 * @param ma
 	 * @param operator
@@ -233,15 +231,15 @@ public class Util {
 	}
 
 	/**
-	 * ����ά����ͬ�ľ����ӦԪ�ز���,�õ��Ľ������mb�У���mb[i][j] = (op_a
-	 * ma[i][j]) op (op_b mb[i][j])
+	 * The two matrices with the same dimension correspond to the element operations, and the result mb obtained is mb [i] [j] = (op_a
+         * ma [i] [j]) op (op_b mb [i] [j])
 	 * 
 	 * @param ma
 	 * @param mb
 	 * @param operatorB
-	 *            �ڵ�mb�����ϵĲ���
+	 *            The mb matrix in the operation
 	 * @param operatorA
-	 *            ��ma����Ԫ���ϵĲ���
+	 *            在ma矩阵元素上的操作
 	 * @return
 	 * 
 	 */
@@ -251,7 +249,7 @@ public class Util {
 		final int m = ma.length;
 		int n = ma[0].length;
 		if (m != mb.length || n != mb[0].length)
-			throw new RuntimeException("���������С��һ�� ma.length:" + ma.length
+			throw new RuntimeException("两个矩阵大小不一致 ma.length:" + ma.length
 					+ "  mb.length:" + mb.length);
 
 		for (int i = 0; i < m; i++) {
@@ -269,7 +267,7 @@ public class Util {
 	}
 
 	/**
-	 * �����ڿ˻�,�Ծ��������չ
+	 * 克罗内克积,对矩阵进行扩展
 	 * 
 	 * @param matrix
 	 * @param scale
@@ -293,7 +291,7 @@ public class Util {
 	}
 
 	/**
-	 * �Ծ�����о�ֵ��С
+	 * 对矩阵进行均值缩小
 	 * 
 	 * @param matrix
 	 * @param scaleSize
@@ -307,7 +305,7 @@ public class Util {
 		final int sn = n / scale.y;
 		final double[][] outMatrix = new double[sm][sn];
 		if (sm * scale.x != m || sn * scale.y != n)
-			throw new RuntimeException("scale��������matrix");
+			throw new RuntimeException("scale不能整除matrix");
 		final int size = scale.x * scale.y;
 		for (int i = 0; i < sm; i++) {
 			for (int j = 0; j < sn; j++) {
@@ -324,7 +322,7 @@ public class Util {
 	}
 
 	/**
-	 * ����fullģʽ�ľ��
+	 * 计算full模式的卷积
 	 * 
 	 * @param matrix
 	 * @param kernel
@@ -336,7 +334,7 @@ public class Util {
 		int n = matrix[0].length;
 		final int km = kernel.length;
 		final int kn = kernel[0].length;
-		// ��չ����
+		// 扩展矩阵
 		final double[][] extendMatrix = new double[m + 2 * (km - 1)][n + 2
 				* (kn - 1)];
 		for (int i = 0; i < m; i++) {
@@ -347,7 +345,7 @@ public class Util {
 	}
 
 	/**
-	 * ����validģʽ�ľ��
+	 * 计算valid模式的卷积
 	 * 
 	 * @param matrix
 	 * @param kernel
@@ -360,11 +358,11 @@ public class Util {
 		int n = matrix[0].length;
 		final int km = kernel.length;
 		final int kn = kernel[0].length;
-		// ��Ҫ�����������
+		// 需要做卷积的列数
 		int kns = n - kn + 1;
-		// ��Ҫ�����������
+		// 需要做卷积的行数
 		final int kms = m - km + 1;
-		// �������
+		// 结果矩阵
 		final double[][] outMatrix = new double[kms][kns];
 
 		for (int i = 0; i < kms; i++) {
@@ -383,7 +381,7 @@ public class Util {
 	}
 
 	/**
-	 * ��ά����ľ��,����Ҫ�����������һά��ͬ
+	 * 三维矩阵的卷积,这里要求两个矩阵的一维相同
 	 * 
 	 * @param matrix
 	 * @param kernel
@@ -401,8 +399,8 @@ public class Util {
 		int kns = n - kn + 1;
 		int khs = h - kh + 1;
 		if (matrix.length != kernel.length)
-			throw new RuntimeException("�����������ڵ�һά�ϲ�ͬ");
-		// �������
+			throw new RuntimeException("矩阵与卷积核在第一维上不同");
+		// 结果矩阵
 		final double[][][] outMatrix = new double[kms][kns][khs];
 		for (int i = 0; i < kms; i++) {
 			for (int j = 0; j < kns; j++)
@@ -426,10 +424,10 @@ public class Util {
 	}
 
 	/**
-	 * �Ծ���Ԫ�����
+	 * 对矩阵元素求和
 	 * 
 	 * @param error
-	 * @return ע�������ͺܿ��ܻ����
+	 * @return 注意这个求和很可能会溢出
 	 */
 
 	public static double sum(double[][] error) {
@@ -445,7 +443,7 @@ public class Util {
 	}
 
 	/**
-	 * ��errors[...][j]Ԫ�����
+	 * 对errors[...][j]元素求和
 	 * 
 	 * @param errors
 	 * @param j
@@ -482,7 +480,7 @@ public class Util {
 	}
 
 	/**
-	 * ���Ծ��,���Խ����4���²������еľ����߲���2��
+	 * 测试卷积,测试结果：4核下并发并行的卷积提高不到2倍
 	 */
 	private static void testConvn() {
 		int count = 1;
@@ -608,7 +606,7 @@ public class Util {
 	}
 
 	/**
-	 * ȡ����Ԫ�ص��±�
+	 * 取最大的元素的下标
 	 * 
 	 * @param out
 	 * @return

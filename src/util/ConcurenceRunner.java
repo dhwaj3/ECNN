@@ -5,11 +5,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * �������й���
+ * Concurrent running tools and
  * 
- * @author jiqunpeng
  * 
- *         ����ʱ�䣺2014-6-16 ����3:33:41
  */
 public class ConcurenceRunner {
 
@@ -60,7 +58,7 @@ public class ConcurenceRunner {
 
 		public void start() {
 			int runCpu = cpuNum < workLength ? cpuNum : 1;
-			// ��Ƭ��������ȡ��
+			// Fragment length rounded up
 			final CountDownLatch gate = new CountDownLatch(runCpu);
 			int fregLength = (workLength + runCpu - 1) / runCpu;
 			for (int cpu = 0; cpu < runCpu; cpu++) {
@@ -78,7 +76,7 @@ public class ConcurenceRunner {
 				};
 				ConcurenceRunner.run(task);
 			}
-			try {// �ȴ������߳�����
+			try {// Wait for all threads to finish running
 				gate.await();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
