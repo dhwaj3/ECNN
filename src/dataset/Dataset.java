@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Map;
 
 public class Dataset {
-	// ��������
+	// save data
 	private List<Record> records;
-	// ����±�
+	// Category subscript
 	private int lableIndex;
 
 	private double maxLable = -1;
@@ -50,19 +50,19 @@ public class Dataset {
 	}
 
 	/**
-	 * �������
+	 * Clear the data
 	 */
 	public void clear() {
 		records.clear();
 	}
 
 	/**
-	 * ���һ����¼
+	 * Add a record
 	 * 
 	 * @param attrs
-	 *            ��¼������
+	 *            Record properties
 	 * @param lable
-	 *            ��¼�����
+	 *            Record the standard standard
 	 */
 	public void append(double[] attrs, Double lable) {
 		records.add(new Record(attrs, lable));
@@ -73,7 +73,7 @@ public class Dataset {
 	}
 
 	/**
-	 * ��ȡ��index����¼������
+	 * Get index index record of the property
 	 * 
 	 * @param index
 	 * @return
@@ -87,14 +87,14 @@ public class Dataset {
 	}
 
 	/**
-	 * �������ݼ�
+	 * Import the data set
 	 * 
 	 * @param filePath
-	 *            �ļ�����·��
+	 *            File name plus path
 	 * @param tag
-	 *            �ֶηָ���
+	 *            Field separator
 	 * @param lableIndex
-	 *            ����±꣬��0��ʼ
+	 *            Class subscript subscript, starting from 0
 	 * @return
 	 */
 	public static Dataset load(String filePath, String tag, int lableIndex) {
@@ -121,19 +121,19 @@ public class Dataset {
 			e.printStackTrace();
 			return null;
 		}
-		System.out.println("��������:" + dataset.size());
+		System.out.println("Import Data:" + dataset.size());
 		return dataset;
 	}
 
 	/**
-	 * ���ݼ�¼(ʵ��),��¼�����Ժ�������,������Ϊ��һ�л������һ�л��߿�
+	 * Data record (instance), the record consists of attributes and categories, the category must be the first column or the last column or empty
 	 * 
 	 * @author jiqunpeng
 	 * 
-	 *         ����ʱ�䣺2014-6-15 ����8:03:29
+	 *         
 	 */
 	public class Record {
-		// �洢����
+		// Storing data
 		private double[] attrs;
 		private Double lable;
 
@@ -157,7 +157,7 @@ public class Dataset {
 		}
 
 		/**
-		 * �ü�¼������
+		 * The record's properties
 		 * 
 		 * @return
 		 */
@@ -175,7 +175,7 @@ public class Dataset {
 		}
 
 		/**
-		 * �ü�¼�����
+		 * The record of the standard standard
 		 * 
 		 * @return
 		 */
@@ -186,7 +186,7 @@ public class Dataset {
 		}
 
 		/**
-		 * �������ж����Ʊ���
+		 * Binary encoding of the class standard
 		 * 
 		 * @param n
 		 * @return
@@ -227,7 +227,7 @@ public class Dataset {
 	}
 
 	/**
-	 * ��ȡ��index����¼
+	 * Get the index record
 	 * 
 	 * @param index
 	 * @return

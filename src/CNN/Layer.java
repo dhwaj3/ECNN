@@ -217,7 +217,7 @@ public class Layer implements Serializable {
 			int x = this.x / scaleSize.x;
 			int y = this.y / scaleSize.y;
 			if (x * scaleSize.x != this.x || y * scaleSize.y != this.y)
-				throw new RuntimeException(this + "不能整除" + scaleSize);
+				throw new RuntimeException(this + "Can not be divisible" + scaleSize);
 			return new Size(x, y);
 		}
 
